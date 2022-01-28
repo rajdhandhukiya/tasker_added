@@ -1,5 +1,5 @@
 import _ from "lodash";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import jsonPlaceholder from "../api/jsonplaceholder";
 
 export const fetchPostsAndUsers = () => async (dispatch, getState) => {

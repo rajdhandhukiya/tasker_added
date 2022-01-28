@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { fetchPostsAndUsers } from "../actions/action";
 import profile from "../Image/profile.svg";
 import message2 from "../Image/message2.svg";
@@ -8,25 +8,62 @@ import notification from "../Image/notification.svg";
 import Edit from "../Image/Edit.svg";
 import { Button, Table } from "react-bootstrap";
 import removal2 from "../Image/removal2.svg";
+import { reverse } from "lodash";
 
 function PostList(props) {
-  const [filteredData, setFilteredData] = useState(props.posts);
+  const post = useSelector((state) => state.posts);
+
+  const filteredData = post;
+  console.log(post);
+
+  const [searchfilteredData, setSearchFilteredData] = useState(filteredData);
+  // const [search, setSearch] = useState("");
+  const [filedName, setFiledName] = useState("");
+  // const [data, setData] = useState("Oldest");
+  const [filterType, setFilterType] = useState(false);
 
   useEffect(() => {
     props.fetchPostsAndUsers();
   }, []);
 
+  useEffect(() => {
+    if (post.length && searchfilteredData.length == 0) {
+      setSearchFilteredData(post);
+    }
+  }, [post]);
+
+  console.log(searchfilteredData);
+
   const handleSearch = (event) => {
-    console.log("event", event.target.value);
-    const data = props?.posts?.filter(
+    const data = filteredData?.filter(
       (item) => item.userId == event.target.value
     );
-    console.log("all", data);
-    setFilteredData(data);
+    setSearchFilteredData(event.target.value ? data : post);
   };
 
-  var posts = props.posts;
+  const handleAss = (event) => {
+    console.log(event.target.value);
+    if (event.target.value == "old") {
+      setFilterType("old");
+    } else setFilterType("new");
+  };
 
+  const onDeleteClick = (index) => {
+    let arr = post;
+    arr.splice(index, 1);
+    setSearchFilteredData([...arr]);
+
+    console.log("removeData", post);
+  };
+
+  // const handleEdit = (editData, index) => {
+  //   setName(editData.Name);
+  //   setEmail(editData.Email);
+  //   setNumber(editData.Number);
+  //   setPassword(editData.Password);
+  //   setIsButton(false);
+  //   setDataIndex(index);
+  // };
   return (
     <>
       <div>
@@ -113,9 +150,11 @@ function PostList(props) {
                         borderRadius: "4px",
                         padding: "8px",
                       }}
+                      // value={filedName}
+                      // onChange={(event) => handleAss(event)}
                     >
-                      <option>Newest</option>
-                      <option>Oldest</option>
+                      <option value="old">Oldest</option>
+                      <option value="new">Newest</option>
                     </select>
                   </div>
                 </div>
@@ -127,7 +166,7 @@ function PostList(props) {
               </div>
             </div>
 
-            <Table>
+            <Table className="table table-hover">
               <thead>
                 <tr>
                   <th>Franchise Id</th>
@@ -140,8 +179,19 @@ function PostList(props) {
                 </tr>
               </thead>
               <tbody>
-                {filteredData &&
-                  filteredData.map((post, index) => {
+                {searchfilteredData
+                  // ?.sort((a, b) => {
+                  //   let fa = a["userId"];
+                  //   let fb = b["userId"];
+                  //   if (filterType == "new" && fa > fb) {
+                  //     return -1;
+                  //   }
+                  //   if (filterType == "old" && fa < fb) {
+                  //     return -1;
+                  //   }
+                  //   return 0;
+                  // })
+                  ?.map((post, index) => {
                     return (
                       <tr key={index}>
                         <td>{post.userId}</td>
@@ -158,6 +208,9 @@ function PostList(props) {
                               padding: "6px",
                               width: "35px ",
                             }}
+                            // onClick={() => {
+                            //   handleEdit(post, index);
+                            // }}
                           >
                             <img
                               src={Edit}
@@ -176,12 +229,12 @@ function PostList(props) {
                               width: "35px ",
                               marginLeft: "5px",
                             }}
+                            onClick={(id) => onDeleteClick(index)}
                           >
                             <img
                               src={removal2}
                               alt="edit"
                               style={{ width: "10px" }}
-                              // onClick={() => onDeleteClick(posts.userId)}
                             />
                           </button>
                         </td>
