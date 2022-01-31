@@ -6,33 +6,37 @@ import profile from "../Image/profile.svg";
 import message2 from "../Image/message2.svg";
 import notification from "../Image/notification.svg";
 import Edit from "../Image/Edit.svg";
-import { Button, Table } from "react-bootstrap";
+import { Button, FormControl, Modal, Table } from "react-bootstrap";
 import removal2 from "../Image/removal2.svg";
-import { reverse } from "lodash";
+import _ from "lodash";
 
 function PostList(props) {
   const post = useSelector((state) => state.posts);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
 
   const filteredData = post;
-  console.log(post);
-
-  const [searchfilteredData, setSearchFilteredData] = useState(filteredData);
-  // const [search, setSearch] = useState("");
-  const [filedName, setFiledName] = useState("");
-  // const [data, setData] = useState("Oldest");
+  const [edit, setEdit] = useState();
+  const [body, setBody] = useState("");
+  const [todos, setTodos] = useState("");
+  const [title, setTitle] = useState("");
+  const [dataIndex, setDataIndex] = useState("");
+  const [isButton, setIsButton] = useState(true);
+  const [data, setData] = useState("");
+  const [filedName, setFiledName] = useState("Oldest");
   const [filterType, setFilterType] = useState(false);
+  const [searchfilteredData, setSearchFilteredData] = useState(filteredData);
 
   useEffect(() => {
     props.fetchPostsAndUsers();
   }, []);
 
   useEffect(() => {
-    if (post.length && searchfilteredData.length == 0) {
+    if (post.length && searchfilteredData.length === 0) {
       setSearchFilteredData(post);
     }
   }, [post]);
-
-  console.log(searchfilteredData);
 
   const handleSearch = (event) => {
     const data = filteredData?.filter(
@@ -48,22 +52,64 @@ function PostList(props) {
     } else setFilterType("new");
   };
 
-  const onDeleteClick = (index) => {
-    let arr = post;
-    arr.splice(index, 1);
+  const onDeleteClick = (id) => {
+    console.log("ffff", id);
+
+    var arr = searchfilteredData;
+    var evens = _.remove(arr, function (n) {
+      return n.id == id;
+    });
+    console.log(arr);
     setSearchFilteredData([...arr]);
+    // for (let i = 0; i < arr.length; i++) {
+    //   // console.log("fwwewer", arr[i].id, id);
 
-    console.log("removeData", post);
+    //   if (arr[i].id == id) {
+    //     console.log("ffffffggfghjfgh", arr[i]);
+    //     arr.splice(arr[i], 1);
+    //   }
+    // }
+    // // console.log("xgvdsds----", arr);
+    // console.log("bc-b------------------", arr);
+
+    // arr.splice();
+    // let arr = post;
+    // for (let i = 0; i < arr.length; i++) {
+    //   // console.log(i, dataIndex);
+    //   if (i === id) {
+    //     // arr[i].title = title;
+    //     // arr[i].body = body;
+    //     // setDataIndex("");
+    //     // console.log("fff", i);
+    //     // arr.splice(i, 1);
+    //     console.log("sss", arr[i]);
+    //   }
+    // }
+    // setSearchFilteredData([...arr]);
+
+    // console.log("removeData", post);
   };
+  const handleShow = (editData, index) => {
+    setTitle(editData.title);
+    setBody(editData.body);
+    setShow(true);
+    setDataIndex(index);
+  };
+  const handleSave = (event, index) => {
+    event.preventDefault();
 
-  // const handleEdit = (editData, index) => {
-  //   setName(editData.Name);
-  //   setEmail(editData.Email);
-  //   setNumber(editData.Number);
-  //   setPassword(editData.Password);
-  //   setIsButton(false);
-  //   setDataIndex(index);
-  // };
+    let arr = post;
+    for (let i = 0; i < arr.length; i++) {
+      // console.log(i, dataIndex);
+      if (i === dataIndex) {
+        arr[i].title = title;
+        arr[i].body = body;
+        setDataIndex("");
+      }
+    }
+    setSearchFilteredData(arr);
+    setShow(false);
+  };
   return (
     <>
       <div>
@@ -151,7 +197,7 @@ function PostList(props) {
                         padding: "8px",
                       }}
                       // value={filedName}
-                      // onChange={(event) => handleAss(event)}
+                      onChange={(event) => handleAss(event)}
                     >
                       <option value="old">Oldest</option>
                       <option value="new">Newest</option>
@@ -164,34 +210,66 @@ function PostList(props) {
                   <Button variant="dark"> Create Franchisee Account</Button>
                 </div>
               </div>
+              <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Edit Value</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <span>Title</span>
+                  <input
+                    name={"title"}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  >
+                    {post.title}
+                  </input>
+
+                  <span>Body</span>
+                  <FormControl
+                    as="textarea"
+                    name={"body"}
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                  />
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={handleClose}>
+                    Close
+                  </Button>
+                  <Button variant="primary" onClick={handleSave}>
+                    Save
+                  </Button>
+                </Modal.Footer>
+              </Modal>
             </div>
 
             <Table className="table table-hover">
               <thead>
                 <tr>
-                  <th>Franchise Id</th>
-                  <th>Franchise Name</th>
-                  <th>company Name</th>
-                  <th>Gym Name</th>
+                  <th>UserId</th>
+                  <th>id</th>
+                  <th>Title </th>
+                  <th>Body</th>
 
-                  <th>Start Date</th>
-                  <th>End Date</th>
+                  <th> Edit</th>
+                  <th> Delete</th>
                 </tr>
               </thead>
               <tbody>
                 {searchfilteredData
-                  // ?.sort((a, b) => {
-                  //   let fa = a["userId"];
-                  //   let fb = b["userId"];
-                  //   if (filterType == "new" && fa > fb) {
-                  //     return -1;
-                  //   }
-                  //   if (filterType == "old" && fa < fb) {
-                  //     return -1;
-                  //   }
-                  //   return 0;
-                  // })
+                  ?.sort((a, b) => {
+                    let fa = a["userId"];
+                    let fb = b["userId"];
+                    if (filterType == "new" && fa > fb) {
+                      return -1;
+                    }
+                    if (filterType == "old" && fa < fb) {
+                      return -1;
+                    }
+                    return 0;
+                  })
                   ?.map((post, index) => {
+                    // console.log("ppp", post.id);
                     return (
                       <tr key={index}>
                         <td>{post.userId}</td>
@@ -208,8 +286,11 @@ function PostList(props) {
                               padding: "6px",
                               width: "35px ",
                             }}
+                            onClick={() => {
+                              handleShow(post, index);
+                            }}
                             // onClick={() => {
-                            //   handleEdit(post, index);
+                            //   handleEdit(post.id);
                             // }}
                           >
                             <img
@@ -229,7 +310,7 @@ function PostList(props) {
                               width: "35px ",
                               marginLeft: "5px",
                             }}
-                            onClick={(id) => onDeleteClick(index)}
+                            onClick={() => onDeleteClick(post.id)}
                           >
                             <img
                               src={removal2}
@@ -247,31 +328,7 @@ function PostList(props) {
         </>
       </div>
 
-      <div className="ui relaxed divided list">
-        {/* <Table borderless>
-          <thead>
-            <tr>
-              <th>userId</th>
-              <th>id</th>
-              <th>title</th>
-              <th>body</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.posts.map((post) => {
-              return (
-                <tr>
-                  <th>{post.userId}</th>
-                  <th>{post.id}</th>
-                  <th>{post.title}</th>
-                  <th>{post.body}</th>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table> */}
-        {/* {this.renderList()} */}
-      </div>
+      <div className="ui relaxed divided list"></div>
     </>
   );
 }
