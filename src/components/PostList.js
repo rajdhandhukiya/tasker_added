@@ -17,14 +17,9 @@ function PostList(props) {
   const handleClose = () => setShow(false);
 
   const filteredData = post;
-  const [edit, setEdit] = useState();
   const [body, setBody] = useState("");
-  const [todos, setTodos] = useState("");
   const [title, setTitle] = useState("");
   const [dataIndex, setDataIndex] = useState("");
-  const [isButton, setIsButton] = useState(true);
-  const [data, setData] = useState("");
-  const [filedName, setFiledName] = useState("Oldest");
   const [filterType, setFilterType] = useState(false);
   const [searchfilteredData, setSearchFilteredData] = useState(filteredData);
 
@@ -61,33 +56,6 @@ function PostList(props) {
     });
     console.log(arr);
     setSearchFilteredData([...arr]);
-    // for (let i = 0; i < arr.length; i++) {
-    //   // console.log("fwwewer", arr[i].id, id);
-
-    //   if (arr[i].id == id) {
-    //     console.log("ffffffggfghjfgh", arr[i]);
-    //     arr.splice(arr[i], 1);
-    //   }
-    // }
-    // // console.log("xgvdsds----", arr);
-    // console.log("bc-b------------------", arr);
-
-    // arr.splice();
-    // let arr = post;
-    // for (let i = 0; i < arr.length; i++) {
-    //   // console.log(i, dataIndex);
-    //   if (i === id) {
-    //     // arr[i].title = title;
-    //     // arr[i].body = body;
-    //     // setDataIndex("");
-    //     // console.log("fff", i);
-    //     // arr.splice(i, 1);
-    //     console.log("sss", arr[i]);
-    //   }
-    // }
-    // setSearchFilteredData([...arr]);
-
-    // console.log("removeData", post);
   };
   const handleShow = (editData, index) => {
     setTitle(editData.title);
@@ -95,12 +63,11 @@ function PostList(props) {
     setShow(true);
     setDataIndex(index);
   };
-  const handleSave = (event, index) => {
+  const handleSave = (event) => {
     event.preventDefault();
 
     let arr = post;
     for (let i = 0; i < arr.length; i++) {
-      // console.log(i, dataIndex);
       if (i === dataIndex) {
         arr[i].title = title;
         arr[i].body = body;
@@ -196,7 +163,6 @@ function PostList(props) {
                         borderRadius: "4px",
                         padding: "8px",
                       }}
-                      // value={filedName}
                       onChange={(event) => handleAss(event)}
                     >
                       <option value="old">Oldest</option>
@@ -258,8 +224,8 @@ function PostList(props) {
               <tbody>
                 {searchfilteredData
                   ?.sort((a, b) => {
-                    let fa = a["userId"];
-                    let fb = b["userId"];
+                    let fa = a["id"];
+                    let fb = b["id"];
                     if (filterType == "new" && fa > fb) {
                       return -1;
                     }
@@ -269,7 +235,6 @@ function PostList(props) {
                     return 0;
                   })
                   ?.map((post, index) => {
-                    // console.log("ppp", post.id);
                     return (
                       <tr key={index}>
                         <td>{post.userId}</td>
